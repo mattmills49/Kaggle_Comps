@@ -1,18 +1,11 @@
-#' # Purchase Relationships
-#' 
-#' I'm curious how the products relate to eachother. I want to see the 
-#' correlation between which products each customer owns in the same month.
-#+ echo = F
-suppressPackageStartupMessages(library(readr))
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(purrr))
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(tidyr))
-suppressPackageStartupMessages(library(stringr))
-source("Santander/lib/helpers.R")
-options(dplyr.width = Inf)
+# Purchase Relationships
 
-#+ same_month, fig.height = 10, fig.width = 8, dpi = 200
+I'm curious how the products relate to eachother. I want to see the 
+correlation between which products each customer owns in the same month.
+
+
+
+```r
 raw_data <- read_csv("~/Documents/Data/Kaggle_Comps/Santander/train_ver2.csv", col_types = col_types, progress = F)
 
 cal_data <- raw_data %>%
@@ -38,11 +31,15 @@ product_cors %>%
   ggtitle("Correlation Between Products (Same Month)") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5),
         legend.position = "top")
+```
 
-#' But what I'm actually interested in is how having one product in a month
-#' relates to having a product in the *next* month. 
-#+ next_month, fig.height = 10, fig.width = 8, dpi = 200
+![plot of chunk same_month](../graphs///same_month-1.png)
 
+But what I'm actually interested in is how having one product in a month
+relates to having a product in the *next* month. 
+
+
+```r
 cal_data %>%
   arrange(customer_code, fetch_date) %>%
   head(100) %>%
@@ -84,10 +81,14 @@ lagged_cors %>%
   ggtitle("Correlation Between Products (Previous Month)") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5),
         legend.position = "top")
+```
 
-#' Let's try that without the same variable
-#+ remove_sames, fig.height = 10, fig.width = 8, dpi = 200
+![plot of chunk next_month](../graphs///next_month-1.png)
 
+Let's try that without the same variable
+
+
+```r
 lagged_cors %>%
   mutate(Correlation = abs(Correlation)) %>%
   filter(str_replace_all(Lagged_Product, "_lagged", "") != Product) %>%
@@ -100,4 +101,7 @@ lagged_cors %>%
   ggtitle("Correlation Between Products (Previous Month)\nSame Products Removed") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5),
         legend.position = "top")
+```
+
+![plot of chunk remove_sames](../graphs///remove_sames-1.png)
 
